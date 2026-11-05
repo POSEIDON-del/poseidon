@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>POSEIDON</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f2f5f3;--surface:#fff;--ink:#17262b;--muted:#53666c;--line:#d5dfdb;--accent:#0b6e8f;--accent-ink:#fff;--ok:#1f8a4c;--code:#e8eeeb;--warn-bg:#fff3d9;--warn-ink:#6b4500;--warn-line:#f0b94a;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111b1e;--surface:#1a272b;--ink:#e8f0ee;--muted:#9bb0b5;--line:#2e4046;--accent:#5cc3e4;--accent-ink:#06222c;--ok:#5fd18a;--code:#0f1a1d;--warn-bg:#3a2d10;--warn-ink:#f6d88f;--warn-line:#8a6a1c;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#111b1e;--surface:#1a272b;--ink:#e8f0ee;--muted:#9bb0b5;--line:#2e4046;--accent:#5cc3e4;--accent-ink:#06222c;--ok:#5fd18a;--code:#0f1a1d;--warn-bg:#3a2d10;--warn-ink:#f6d88f;--warn-line:#8a6a1c;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Atkinson Hyperlegible",system-ui,sans-serif}
+main{max-width:980px;margin:0 auto;padding:18px 14px 40px}
+h1,h2,.big{font-family:"Bricolage Grotesque","Atkinson Hyperlegible",sans-serif;line-height:1.15;margin:0}
+h1{font-size:1.7rem}
+.top{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;margin-bottom:16px}
+.os{display:flex;gap:6px}
+.os button{padding:9px 14px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;font:inherit;font-weight:700;cursor:pointer}
+.os button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent);color:var(--accent-ink)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:12px}
+.tile,.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px}
+.tile small{color:var(--muted);display:block}
+.big{font-size:1.5rem;margin-top:2px}
+.bar{height:10px;background:var(--line);border-radius:5px;overflow:hidden;margin-top:8px}
+.bar i{display:block;height:100%;width:0;background:var(--ok);transition:width .3s}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:12px}
+.card h2{font-size:1.1rem;display:flex;gap:10px;align-items:center;margin-bottom:8px}
+.card.done{border-color:var(--ok)}
+.chk{margin-left:auto;display:flex;align-items:center;gap:6px;font:700 .85rem "Atkinson Hyperlegible",sans-serif;color:var(--muted);cursor:pointer;white-space:nowrap}
+.chk input{width:22px;height:22px;accent-color:var(--ok);cursor:pointer}
+.card ol,.card ul{padding-left:1.15em;margin:8px 0}
+.card li{margin:5px 0}
+.card p{margin:8px 0}
+a{color:var(--accent);font-weight:700}
+code{background:var(--code);padding:1px 5px;border-radius:4px;font-size:.9em;word-break:break-word}
+pre{background:var(--code);padding:10px;border-radius:8px;overflow-x:auto;margin:8px 0;font-size:.88rem}
+.wide{grid-column:1/-1}
+.note{background:var(--warn-bg);color:var(--warn-ink);border-left:4px solid var(--warn-line);padding:9px 11px;border-radius:6px;margin-top:10px;font-size:.93rem}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.93rem}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+.sec{grid-column:1/-1;margin:8px 0 -2px;font-size:1.05rem;color:var(--muted)}
+footer{text-align:center;margin-top:28px;padding-top:14px;border-top:1px solid var(--line);color:var(--muted);font-size:.9rem}footer b{font-family:"Bricolage Grotesque",sans-serif;color:var(--accent);letter-spacing:.04em}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+</style>
+</head>
+<body>
+<main>
+  <div class="top">
+    <h1>Tableau de bord : VirtualBox et Debian</h1>
+    <div class="os" id="os" role="group" aria-label="Système de votre ordinateur"></div>
+  </div>
+  <div class="tiles">
+    <div class="tile"><small>Progression</small><div class="big" id="pct">0 %</div><div class="bar"><i id="fill"></i></div></div>
+    <div class="tile"><small>Debian (netinst)</small><div class="big">≈ 700 Mo</div></div>
+    <div class="tile"><small>RAM conseillée</small><div class="big">4 Go</div></div>
+    <div class="tile"><small>Disque virtuel</small><div class="big">20 Go</div></div>
+    <div class="tile"><small>Durée estimée</small><div class="big">45 à 75 min</div></div>
+  </div>
+  <div class="grid" id="grid"></div>
+  <footer>Réalisé par <b>POSEIDON</b></footer>
+</main>
+<script>
+var O={
+  win:{n:"Windows",hosts:"Windows hosts",inst:"Ouvrez le fichier <code>.exe</code> depuis la barre de téléchargements de Chrome, acceptez la fenêtre d’autorisation, puis cliquez sur « Next » jusqu’à « Install » et « Finish ».",extra:"Si l’installation signale un composant manquant (Visual C++), installez-le puis relancez le fichier."},
+  mac:{n:"macOS (Intel)",hosts:"macOS / Intel hosts",inst:"Ouvrez le fichier <code>.dmg</code> depuis les téléchargements de Chrome, double-cliquez sur le paquet VirtualBox, puis suivez l’assistant.",extra:"Autorisez l’extension dans Réglages Système > Confidentialité et sécurité, puis redémarrez. Sur Mac Apple Silicon (M1 à M4), VirtualBox ne lance que des systèmes ARM : prenez l’ISO Debian arm64."}
+};
+var cur="win",done={};
+try{var s0=localStorage.getItem("vbox-done");if(s0)done=JSON.parse(s0)||{}}catch(e){}
+function save(){try{localStorage.setItem("vbox-done",JSON.stringify(done))}catch(e){}}
+function steps(){var o=O[cur];return[
+{g:"Partie 1 : installer VirtualBox",t:"Vérifier la virtualisation",h:"<p>Votre processeur doit avoir la virtualisation activée (VT-x ou AMD-V).</p><ul><li>Windows : Gestionnaire des tâches > Performance > UC > « Virtualisation : Activé ».</li><li>Sinon, activez-la dans le BIOS/UEFI (option « Intel VT-x », « SVM Mode » ou « Virtualization »).</li></ul>"},
+{t:"Télécharger depuis Chrome",h:"<ol><li>Ouvrez Chrome et allez sur <a href='https://www.virtualbox.org/wiki/Downloads' target='_blank' rel='noopener'>virtualbox.org/wiki/Downloads</a>.</li><li>Cliquez sur « "+o.hosts+" » dans la section VirtualBox (dernière version).</li><li>Chrome télécharge le fichier : suivez-le avec l’icône de téléchargement en haut à droite, ou avec <code>Ctrl+J</code>.</li></ol><div class='note'>Si Chrome affiche « Fichier rarement téléchargé », vérifiez que l’adresse est bien virtualbox.org, puis choisissez « Conserver ».</div>"},
+{t:"Installer VirtualBox",h:"<p>"+o.inst+"</p><div class='note'>"+o.extra+"</div>"},
+{g:"Partie 2 : récupérer Debian",t:"Télécharger l’ISO Debian",h:"<ol><li>Dans Chrome, ouvrez <a href='https://www.debian.org/distrib/' target='_blank' rel='noopener'>debian.org/distrib</a>.</li><li>Sous « Petite image d’installation par le réseau », cliquez sur l’image <b>amd64</b> (netinst, environ 700 Mo).</li><li>Gardez le fichier <code>.iso</code> dans votre dossier Téléchargements.</li></ol><p>L’image netinst télécharge le reste pendant l’installation : il faut donc internet dans la machine virtuelle.</p>"},
+{g:"Partie 3 : créer la machine virtuelle",t:"Créer la machine",h:"<ol><li>Ouvrez VirtualBox, cliquez sur « Nouvelle » (ou « New »).</li><li>Nom : <code>Debian</code>. Dans « ISO Image », choisissez le fichier Debian ; le type passe à Linux / Debian (64-bit).</li><li>Cochez « Skip Unattended Installation » pour installer à la main.</li><li>Réglez la mémoire, les processeurs et le disque (voir le tableau ci-dessous), puis « Finish ».</li></ol>"},
+{t:"Installer Debian",h:"<ol><li>Cliquez sur « Démarrer ». Choisissez « Graphical install ».</li><li>Langue, pays et clavier : français.</li><li>Nom de machine : <code>debian</code>. Domaine : laissez vide.</li><li>Définissez un mot de passe root, puis créez votre utilisateur.</li><li>Partitionnement : « Assisté – utiliser un disque entier », puis tout dans une seule partition.</li><li>Logiciels : cochez un bureau (GNOME ou Xfce), « serveur SSH » facultatif et « utilitaires usuels du système ».</li><li>Installez GRUB sur <code>/dev/sda</code>, puis « Continuer » pour redémarrer.</li></ol><div class='note'>Le « disque entier » concerne uniquement le disque virtuel de 20 Go, pas votre vrai disque.</div>"},
+{g:"Partie 4 : finaliser",t:"Ajouter les Additions invité",h:"<p>Elles donnent le plein écran, le copier-coller et le dossier partagé.</p><ol><li>Dans Debian, ouvrez un terminal et passez root avec <code>su -</code>.</li><li>Installez les outils :</li></ol><pre>apt update\napt install build-essential dkms linux-headers-$(uname -r)</pre><ol start='3'><li>Dans le menu de la machine : Périphériques > « Insérer l’image CD des Additions invité ».</li><li>Lancez <code>/media/cdrom/VBoxLinuxAdditions.run</code>, puis redémarrez.</li></ol>"},
+{t:"Utiliser sa machine",h:"<ul><li>Ajoutez-vous au groupe d’administration si besoin : <code>usermod -aG sudo votre_nom</code> (en root).</li><li>Activez le presse-papiers partagé : Périphériques > Presse-papiers partagé > Bidirectionnel.</li><li>Créez un instantané (Snapshot) avant de tester des choses risquées.</li><li>Éteignez toujours Debian proprement avant de fermer la fenêtre.</li></ul>"}
+]}
+function render(){
+  var s=steps(),g=document.getElementById("grid"),n=0;g.innerHTML="";
+  s.forEach(function(x,i){
+    if(x.g){var h=document.createElement("div");h.className="sec";h.textContent=x.g;g.appendChild(h)}
+    var ok=!!done[i];if(ok)n++;
+    var c=document.createElement("section");c.className="card"+(ok?" done":"");
+    c.innerHTML="<h2>"+x.t+"<label class='chk'><input type='checkbox'"+(ok?" checked":"")+" aria-label='"+x.t+" : terminé'>Fait</label></h2>"+x.h;
+    c.querySelector("input").onchange=function(e){if(e.target.checked)done[i]=1;else delete done[i];save();render()};
+    g.appendChild(c);
+    if(i==4){var t=document.createElement("section");t.className="card wide";
+      t.innerHTML="<h2>Réglages conseillés pour la machine</h2><div class='scroll'><table><tr><th>Paramètre</th><th>Valeur</th></tr><tr><td>Nom / type</td><td>Debian / Linux, Debian (64-bit)</td></tr><tr><td>Mémoire</td><td>4096 Mo (2048 Mo minimum)</td></tr><tr><td>Processeurs</td><td>2</td></tr><tr><td>Disque</td><td>20 Go, VDI, alloué dynamiquement</td></tr><tr><td>Réseau</td><td>NAT (par défaut)</td></tr></table></div>";
+      g.appendChild(t)}
+  });
+  var p=Math.round(n/s.length*100);
+  document.getElementById("pct").textContent=p+" %";
+  document.getElementById("fill").style.width=p+"%";
+  var ds=document.getElementById("os");ds.innerHTML="";
+  Object.keys(O).forEach(function(k){var b=document.createElement("button");b.textContent=O[k].n;b.setAttribute("aria-pressed",k==cur);b.onclick=function(){cur=k;render()};ds.appendChild(b)});
+}
+render();
+</script>
+</body>
+</html>
